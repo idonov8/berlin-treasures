@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Berlin Treasures</title>
+  <meta name="description" content="Berlin Treasures — a community for sharing awesome street findings. One man's trash is another man's treasure." />
+
+  <!-- Fonts: title = Bungee, body = Baloo 2. Swap here + in styles.css tokens. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Bungee&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Interactive physics layer (Matter.js draws the falling / draggable cans + gold here) -->
+  <canvas id="playground" aria-hidden="true"></canvas>
+
+  <main class="hero">
+    <!-- Hero trash can (user-supplied illustration, transparent PNG) -->
+    <div class="hero-can">
+      <img src="assets/hero-can.png" alt="A grey trash can overflowing with sparkling gold coins" width="640" height="640" />
+    </div>
+
+    <h1 class="title">Berlin Treasures</h1>
+
+    <p class="quote">&ldquo;One man&rsquo;s trash is another man&rsquo;s treasure&rdquo;</p>
+
+    <p class="welcome">Welcome to the Berlin Treasures community!</p>
+    <p class="subtext">A place to share awesome street findings with each other</p>
+
+    <a class="telegram" href="https://t.me/BerlinTreasures" target="_blank" rel="noopener noreferrer">
+      <svg class="tg-icon" viewBox="0 0 24 24" aria-hidden="true" width="24" height="24">
+        <path fill="currentColor" d="M9.78 15.6 9.45 20c.47 0 .68-.2.93-.44l2.23-2.13 4.62 3.38c.85.47 1.45.22 1.68-.78l3.04-14.25c.3-1.36-.5-1.9-1.36-1.57L1.9 9.62C.56 10.13.58 10.9 1.66 11.24l4.65 1.45L18.1 5.2c.55-.36 1.05-.16.64.2z"/>
+      </svg>
+      Join us on Telegram
+    </a>
+  </main>
+
+  <!-- Physics engine (documented so it can be vendored locally for offline use) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+  <script src="physics.js"></script>
+</body>
+</html>

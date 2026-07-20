@@ -1,0 +1,187 @@
+/* ============================================================
+   Berlin Treasures — design tokens (mirror of design-system.md)
+   ============================================================ */
+:root {
+  /* colour */
+  --bg-center: #aede54;
+  --bg-mid:    #6aa62f;
+  --bg-edge:   #33611b;
+
+  --gold-shine: #fff4b8;
+  --gold:       #ffd23f;
+  --gold-deep:  #f0a017;
+  --gold-dark:  #c47f00;
+
+  --can-light: #cdd2d7;
+  --can:       #aab0b6;
+  --can-dark:  #7f878e;
+
+  --outline:    #243528;
+  --text-cream: #fff7e2;
+  --text-quote: #eafcbf;
+
+  /* type */
+  --font-display: "Bungee", "Arial Black", "Trebuchet MS", sans-serif;
+  --font-body:    "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+
+  /* spacing & effects */
+  --hero-max: 760px;
+  --stack-gap: clamp(0.7rem, 2.2vh, 1.4rem);
+  --outline-w: 3px;
+  --radius: 999px;
+  --shadow-drop: 0 6px 0 rgba(0, 0, 0, 0.22);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+  min-height: 100vh;
+  background: radial-gradient(circle at 50% 42%,
+              var(--bg-center) 0%, var(--bg-mid) 55%, var(--bg-edge) 100%);
+  background-attachment: fixed;
+  overflow: hidden;
+  font-family: var(--font-body);
+  color: var(--text-cream);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---- physics layer -------------------------------------------------- */
+#playground {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;              /* above the hero text, below the button */
+  display: block;
+  touch-action: none;      /* let Matter.js own drag gestures on touch */
+}
+
+/* ---- hero (content column) ----------------------------------------- */
+.hero {
+  position: relative;      /* no z-index → does NOT trap the button */
+  pointer-events: none;    /* clicks pass through to the canvas */
+  max-width: var(--hero-max);
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: clamp(1.2rem, 4vh, 2.6rem) 1.2rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--stack-gap);
+  text-align: center;
+}
+
+.hero-can {
+  width: clamp(160px, 26vh, 248px);
+  pointer-events: none;
+  filter: drop-shadow(0 12px 10px rgba(0, 0, 0, 0.28));
+  animation: canBob 4s ease-in-out infinite;
+}
+.hero-can img { width: 100%; height: auto; display: block; }
+@keyframes canBob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-8px) rotate(1deg); }
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: 1px;
+  font-size: clamp(2.3rem, 8vw, 5.4rem);
+  color: var(--gold);                                   /* fallback fill */
+  -webkit-text-stroke: var(--outline-w) var(--outline);
+  paint-order: stroke fill;                             /* outline behind fill */
+  filter: drop-shadow(var(--shadow-drop));
+  margin-top: 0.1em;
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .title {
+    background: linear-gradient(180deg,
+                var(--gold-shine) 0%, var(--gold) 52%, var(--gold-deep) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+}
+
+.quote {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--text-quote);
+  font-size: clamp(1.05rem, 3.2vw, 1.85rem);
+  max-width: 22ch;
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.4);
+}
+
+.welcome {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
+}
+
+.subtext {
+  font-family: var(--font-body);
+  font-weight: 500;
+  opacity: 0.92;
+  font-size: clamp(0.95rem, 2.3vw, 1.2rem);
+  max-width: 36ch;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+.telegram {
+  pointer-events: auto;                 /* clickable above the canvas */
+  position: relative;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-top: 0.35em;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: clamp(1rem, 2.6vw, 1.3rem);
+  color: var(--outline);
+  text-decoration: none;
+  background: linear-gradient(180deg, var(--gold-shine), var(--gold) 55%, var(--gold-deep));
+  padding: 0.7em 1.35em;
+  border: var(--outline-w) solid var(--outline);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-drop);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.telegram:hover { transform: translateY(-3px) rotate(-1deg); box-shadow: 0 10px 0 rgba(0, 0, 0, 0.22); }
+.telegram:active { transform: translateY(0); box-shadow: 0 3px 0 rgba(0, 0, 0, 0.22); }
+.telegram:focus-visible { outline: 3px solid var(--text-cream); outline-offset: 3px; }
+.tg-icon { flex: 0 0 auto; }
+
+/* ---- interaction hint ---------------------------------------------- */
+.hint {
+  position: fixed;
+  left: 0; right: 0; bottom: 16px;
+  z-index: 8;
+  pointer-events: none;
+  text-align: center;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-cream);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+  animation: hintPulse 2.4s ease-in-out infinite;
+  transition: opacity 0.6s ease;
+}
+.hint.hide { opacity: 0; }
+@keyframes hintPulse {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-can, .hint { animation: none; }
+  .telegram { transition: none; }
+}

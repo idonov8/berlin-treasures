@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 150" width="120" height="150">
+  <!-- Berlin Treasures grey trash can (physics sprite). Edit greys here or via design-system.md tokens. -->
+  <defs>
+    <linearGradient id="canBody" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#cdd2d7"/>
+      <stop offset="42%" stop-color="#aab0b6"/>
+      <stop offset="100%" stop-color="#7f878e"/>
+    </linearGradient>
+    <linearGradient id="canLid" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#d6dbdf"/>
+      <stop offset="100%" stop-color="#899097"/>
+    </linearGradient>
+  </defs>
+  <!-- side handles -->
+  <path d="M27 62 q-13 9 0 22" fill="none" stroke="#2b3a33" stroke-width="6" stroke-linecap="round"/>
+  <path d="M93 62 q13 9 0 22" fill="none" stroke="#2b3a33" stroke-width="6" stroke-linecap="round"/>
+  <!-- body -->
+  <path d="M30 46 L90 46 L82 138 Q81 146 73 146 L47 146 Q39 146 38 138 Z"
+        fill="url(#canBody)" stroke="#2b3a33" stroke-width="5" stroke-linejoin="round"/>
+  <!-- vertical ribs -->
+  <g stroke="#727a81" stroke-width="4" stroke-linecap="round" opacity="0.85">
+    <line x1="49" y1="58" x2="46" y2="132"/>
+    <line x1="60" y1="58" x2="60" y2="132"/>
+    <line x1="71" y1="58" x2="74" y2="132"/>
+  </g>
+  <!-- highlight -->
+  <path d="M42 58 L40 130" fill="none" stroke="#eef1f3" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+  <!-- open rim (lid lives in its own sprite: can-lid.svg, and falls separately) -->
+  <rect x="25" y="37" width="70" height="15" rx="7.5" fill="url(#canLid)" stroke="#2b3a33" stroke-width="5"/>
+  <!-- dark opening, so the can reads as empty/open -->
+  <ellipse cx="60" cy="44" rx="32" ry="7" fill="#3a4640"/>
+</svg>
