@@ -17,40 +17,57 @@ reads — keep them in sync when you tweak.
 
 ## 1. Colour
 
+A printed-poster green rather than a candy/game green — darker, less neon, so gold and paper
+elements pop instead of everything competing at the same brightness.
+
 | Token | Value | Used for |
 |---|---|---|
-| `--bg-center` | `#aede54` | radial gradient centre (bright yellow-green) |
-| `--bg-mid` | `#6aa62f` | radial gradient middle |
-| `--bg-edge` | `#33611b` | radial gradient outer edge (dark forest) |
-| `--gold-shine` | `#fff4b8` | coin/title top highlight |
+| `--bg-center` | `#bfdf70` | radial gradient centre (kept small — see §3 vignette) |
+| `--bg-mid` | `#5c8c34` | radial gradient middle |
+| `--bg-edge` | `#16300f` | radial gradient outer edge (deep pine) |
 | `--gold` | `#ffd23f` | primary gold |
-| `--gold-deep` | `#f0a017` | gold shadow tone |
-| `--gold-dark` | `#c47f00` | deepest gold / coin edge |
+| `--gold-shine` | `#fff4b8` | coin highlight (coins only — kept off the title, see §2) |
+| `--gold-deep` | `#f0a017` | gold shadow tone / title gradient base |
+| `--gold-dark` | `#c47f00` | deepest gold / coin edge / button border |
 | `--can-light` | `#cdd2d7` | trash-can highlight |
 | `--can` | `#aab0b6` | trash-can base grey |
 | `--can-dark` | `#7f878e` | trash-can shadow grey |
-| `--outline` | `#243528` | universal dark cartoon outline |
+| `--outline` | `#243528` | deep ink — borders/text *on paper*, used sparingly (not a cartoon stroke) |
+| `--riso-shadow` | `#0f2b19` | duotone offset behind the title, like mis-registered print |
 | `--text-cream` | `#fff7e2` | body copy on the gradient |
-| `--text-quote` | `#eafcbf` | the quote |
+| `--paper` | `#f3e6c8` | kraft-tag / quote-card background |
+| `--paper-edge` | `#d9c194` | paper shadow/edge tone |
 
-The background is `radial-gradient(circle at 50% 42%, var(--bg-center), var(--bg-mid) 55%, var(--bg-edge) 100%)`.
+The background layers a bottom vignette (grounds the can pile in shadow) over the radial
+gradient, centred high (`18%` from the top) so the brightest zone stays around the hero can
+and the title/quote sit in the darker mid-tone where gold and paper actually contrast:
+`radial-gradient(120% 70% at 50% 108%, rgba(0,0,0,.4), transparent 62%), radial-gradient(circle at 50% 18%, var(--bg-center) 0%, var(--bg-mid) 42%, var(--bg-edge) 100%)`.
+A faint SVG-noise grain (`.grain`, ~5% opacity, `mix-blend-mode: overlay`) sits above the
+canvas to unify the flat gradient and the sprites into one surface — it's `pointer-events:none`
+so it never blocks dragging.
 
 ## 2. Typography
 
 | Token | Value |
 |---|---|
-| `--font-display` | `"Bungee"` — bold urban/street-sign title font |
+| `--font-display` | `"Cal Sans"` — bold geometric sans title font |
 | `--font-body` | `"Baloo 2"` — everything else (rounded, friendly) |
+| `--font-label` | `"Courier Prime"` — typewriter font for the small tag/label accent |
 
 Loaded from Google Fonts in [`index.html`](index.html)'s `<head>`. To swap fonts, change that
-`<link>` and these two tokens. System fallbacks (`sans-serif` / `system-ui`) keep the page
-legible if the fonts fail to load. To go fully offline/self-contained, download the `woff2`
-files into `assets/fonts/` and replace the `<link>` with local `@font-face` rules.
+`<link>` and these tokens. System fallbacks (`sans-serif` / `system-ui` / `monospace`) keep the
+page legible if the fonts fail to load. To go fully offline/self-contained, download the
+`woff2` files into `assets/fonts/` and replace the `<link>` with local `@font-face` rules.
 
-- **Title** — display font, gold vertical gradient fill, dark outline (`paint-order` stroke),
-  drop shadow. Size `clamp(2.6rem, 9vw, 6rem)`.
-- **Quote** — body font italic, `--text-quote`, size `clamp(1.1rem, 3.2vw, 1.9rem)`.
+- **Title** — always forced onto two lines ("Berlin" / "Treasures", one word per line, via
+  child `<span>`s — not just wrapped text) on every viewport, mobile included. A **duotone
+  offset-print** treatment rather than a thick cartoon outline: gold vertical gradient fill,
+  a *thin* 1.5px ink stroke just for edge definition, plus a hard unblurred
+  `text-shadow: 5px 6px 0 var(--riso-shadow)` — like a slightly mis-registered screen print.
+  Size `clamp(2.8rem, 12vw, 6rem)`.
+- **Quote** — styled as a small rotated paper card (see §3), not text floating on the gradient.
 - **Welcome line** — body font 700. **Sub-line** — body font 500, slightly muted.
+- **Found tag** — `--font-label`, uppercase, small, on a `--paper` chip near the hero can.
 
 ## 3. Spacing & effects
 
@@ -58,11 +75,15 @@ files into `assets/fonts/` and replace the `<link>` with local `@font-face` rule
 |---|---|---|
 | `--hero-max` | `760px` | max width of the centred content column |
 | `--stack-gap` | `clamp(0.7rem, 2.2vh, 1.4rem)` | vertical rhythm between hero elements |
-| `--outline-w` | `3px` | title stroke width |
 | `--radius` | `999px` | pill radius (Telegram button) |
-| `--shadow-drop` | `0 6px 0 rgba(0,0,0,.22)` | chunky cartoon drop shadow |
+| `--radius-card` | `14px` | corner radius for the quote/tag paper cards |
+| `--shadow-soft` | `0 16px 28px rgba(6,18,9,.38)` | ambient lift (button) |
+| `--shadow-card` | `0 10px 18px rgba(6,18,9,.3)` | ambient lift (paper cards) |
 
-The **Telegram button** is a gold pill with the dark outline + drop shadow; it lifts on hover.
+The **Telegram button** is a gold pill with a thin `--gold-dark` border and a soft ambient
+shadow (no hard cartoon offset) — it lifts smoothly on hover instead of jumping. The **quote**
+and **found tag** are `--paper` cards, slightly rotated, like something torn off a market
+stall — this is the main device that ties the "flea market find" concept together.
 
 ## 4. Physics knobs (`CONFIG` in `physics.js`)
 

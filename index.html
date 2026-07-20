@@ -6,26 +6,28 @@
   <title>Berlin Treasures</title>
   <meta name="description" content="Berlin Treasures — a community for sharing awesome street findings. One man's trash is another man's treasure." />
 
-  <!-- Fonts: title = Bungee, body = Baloo 2. Swap here + in styles.css tokens. -->
+  <!-- Fonts: title = Cal Sans, body = Baloo 2, tags/labels = Courier Prime. Swap here + in styles.css tokens. -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Bungee&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Cal+Sans&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <!-- Interactive physics layer (Matter.js draws the falling / draggable cans + gold here) -->
   <canvas id="playground" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
 
   <main class="hero">
     <!-- Hero trash can (user-supplied illustration, transparent PNG) -->
     <div class="hero-can">
       <img src="assets/hero-can.png" alt="A grey trash can overflowing with sparkling gold coins" width="640" height="640" />
+      <span class="found-tag" aria-hidden="true">Street find</span>
     </div>
 
-    <h1 class="title">Berlin Treasures</h1>
+    <h1 class="title"><span>Berlin</span><span>Treasures</span></h1>
 
-    <p class="quote">&ldquo;One man&rsquo;s trash is another man&rsquo;s treasure&rdquo;</p>
+    <blockquote class="quote">One man&rsquo;s trash is another man&rsquo;s treasure</blockquote>
 
     <p class="welcome">Welcome to the Berlin Treasures community!</p>
     <p class="subtext">A place to share awesome street findings with each other</p>
