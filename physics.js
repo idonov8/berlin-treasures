@@ -23,9 +23,9 @@
 
   var CONFIG = {
     gravityY:        1.0,
-    initialCans:     isMobile ? 5 : 9,
+    initialCans:     isMobile ? 5 : 25,
     spawnStaggerMs:  isMobile ? 340 : 240,
-    maxCoins:        isMobile ? 70 : 130,
+    maxCoins:        isMobile ? 70 : 530,
     spillBurst:      isMobile ? 4 : 5,
 
     // coins: tiny + varied (ovals via non-uniform stretch + random orientation)
