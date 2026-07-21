@@ -69,24 +69,31 @@
     liftMaxDy = window.innerHeight - rect.bottom;
     wrap.style.transition = '';   // interrupt any in-progress snap-back
     wrap.classList.add('lifted');
-    if (wrap.setPointerCapture) {
-      try { wrap.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
-    }
+    if (e.cancelable) e.preventDefault();   // stop iOS from hijacking the touch for scroll/zoom
+    // Listen on window for the rest of the gesture. setPointerCapture is flaky
+    // on iOS Safari (it often fires pointercancel or stops delivering moves),
+    // so we track move/up globally and clean up on release instead.
+    window.addEventListener('pointermove', onLiftMove, { passive: false });
+    window.addEventListener('pointerup', onLiftUp);
+    window.addEventListener('pointercancel', onLiftUp);
     vibrate(6);   // little "pickup" tick
     e.stopPropagation();   // don't also let .hero's spin handler see this gesture
   }
 
   function onLiftMove(e) {
     if (!lifting) return;
+    if (e.cancelable) e.preventDefault();
     var dx = Math.max(liftMinDx, Math.min(liftMaxDx, (e.clientX - liftStartX) * DRAG_DAMPING));
     var dy = Math.max(liftMinDy, Math.min(liftMaxDy, (e.clientY - liftStartY) * DRAG_DAMPING));
     liftRender(dx, dy, 1.06);
-    e.stopPropagation();
   }
 
   function onLiftUp(e) {
     if (!lifting) return;
     lifting = false;
+    window.removeEventListener('pointermove', onLiftMove);
+    window.removeEventListener('pointerup', onLiftUp);
+    window.removeEventListener('pointercancel', onLiftUp);
     if (reduceMotion) {
       liftRender(0, 0, 1);
       wrap.classList.remove('lifted');
@@ -101,13 +108,9 @@
       wrap.removeEventListener('transitionend', onEnd);
     };
     wrap.addEventListener('transitionend', onEnd);
-    if (e) e.stopPropagation();
   }
 
   wrap.addEventListener('pointerdown', onLiftDown);
-  wrap.addEventListener('pointermove', onLiftMove);
-  wrap.addEventListener('pointerup', onLiftUp);
-  wrap.addEventListener('pointercancel', onLiftUp);
 
   /* ==================================================================
      2. Swipe-to-spin: a directional swipe that starts near the can
@@ -236,25 +239,36 @@
     velocity = 0;
     lastX = e.clientX;
     lastTime = performance.now();
-    if (e.currentTarget.setPointerCapture) {
-      try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
-    }
+    if (e.cancelable) e.preventDefault();   // stop iOS from claiming the touch for scroll/zoom
+    // Track the rest of the gesture on window. setPointerCapture is unreliable
+    // on iOS Safari (pointercancel fires early, moves stop), so without this a
+    // swipe-to-spin would die mid-gesture on iPhone.
+    window.addEventListener('pointermove', onSpinMove, { passive: false });
+    window.addEventListener('pointerup', onSpinUp);
+    window.addEventListener('pointercancel', onSpinUp);
   }
 
   function onSpinMove(e) {
     if (!spinning) return;
+    if (e.cancelable) e.preventDefault();
     var now = performance.now();
-    // flipped so the can turns the way the swipe actually drags it around
-    var delta = (lastX - e.clientX) * SPIN_SENSITIVITY;
-    var dt = Math.max(now - lastTime, 1);
-
-    angle += delta;
-    // smooth the instantaneous velocity a bit so a jittery last sample
-    // doesn't dictate the whole release throw
-    velocity = velocity * 0.5 + (delta / dt) * 0.5;
-
-    lastX = e.clientX;
-    lastTime = now;
+    // iOS coalesces touch moves heavily — a single pointermove can represent
+    // several intermediate touches. Fold them all in so the angle tracks the
+    // finger exactly and the release velocity isn't dominated by one stale sample.
+    var events = (typeof e.getCoalescedEvents === 'function' && e.getCoalescedEvents().length)
+      ? e.getCoalescedEvents() : [e];
+    for (var i = 0; i < events.length; i++) {
+      var ev = events[i];
+      // flipped so the can turns the way the swipe actually drags it around
+      var delta = (lastX - ev.clientX) * SPIN_SENSITIVITY;
+      var dt = Math.max(now - lastTime, 1);
+      angle += delta;
+      // smooth the instantaneous velocity a bit so a jittery last sample
+      // doesn't dictate the whole release throw
+      velocity = velocity * 0.5 + (delta / dt) * 0.5;
+      lastX = ev.clientX;
+      lastTime = now;
+    }
     render();
     tick();
   }
@@ -262,6 +276,12 @@
   function onSpinUp(e) {
     if (!spinning) return;
     spinning = false;
+    window.removeEventListener('pointermove', onSpinMove);
+    window.removeEventListener('pointerup', onSpinUp);
+    window.removeEventListener('pointercancel', onSpinUp);
+    // pointercancel (iOS taking over the gesture) reaches here too — if we
+    // still have a usable velocity, honor it as a flick so the spin keeps its
+    // inertia instead of dying flat.
     if (Math.abs(velocity) > FLICK_MIN_VEL) {
       vibrate(Math.min(35, 10 + Math.abs(velocity) * 60));   // flick-release buzz, scaled with speed
       spin();
@@ -274,16 +294,11 @@
   // "hero" catches swipes that start directly on the can's own artwork
   // (bubbled up from #heroCan, outside the tight lift-core); "spinZone"
   // catches the ring beyond the can's box, which otherwise falls through
-  // straight to the physics canvas
+  // straight to the physics canvas. Both only handle the pointerdown —
+  // moves/ups are tracked on window (see onSpinDown) for iOS reliability.
   hero.addEventListener('pointerdown', onSpinDown);
-  hero.addEventListener('pointermove', onSpinMove);
-  hero.addEventListener('pointerup', onSpinUp);
-  hero.addEventListener('pointercancel', onSpinUp);
 
   if (spinZone) {
     spinZone.addEventListener('pointerdown', onSpinDown);
-    spinZone.addEventListener('pointermove', onSpinMove);
-    spinZone.addEventListener('pointerup', onSpinUp);
-    spinZone.addEventListener('pointercancel', onSpinUp);
   }
 })();

@@ -134,6 +134,7 @@ body {
   will-change: transform;
   -webkit-user-drag: none;
   user-select: none;
+  touch-action: none;        /* iOS honors touch-action on the actual touch target, and the touch often lands on the img itself */
 }
 @keyframes canBob {
   0%, 100% { transform: translateY(0); }
