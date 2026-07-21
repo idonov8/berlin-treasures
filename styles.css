@@ -76,8 +76,11 @@ body {
 
 /* ---- hero (content column) ----------------------------------------- */
 .hero {
-  position: relative;      /* no z-index → does NOT trap the button */
-  pointer-events: none;    /* clicks pass through to the canvas */
+  position: relative;
+  z-index: 9;               /* above #playground (5) so it can catch swipe-to-spin, below .telegram (10) */
+  pointer-events: auto;     /* the whole column is the "spin zone" — swipe anywhere here (but not on the can) to spin it */
+  touch-action: none;       /* we own the swipe gesture, don't let the page scroll/zoom */
+  user-select: none;
   max-width: var(--hero-max);
   margin: 0 auto;
   min-height: 100vh;
@@ -89,18 +92,41 @@ body {
   gap: var(--stack-gap);
   text-align: center;
 }
+/* text/quote content stays purely visual — clicks/swipes fall through to .hero's
+   own spin handler (or, outside the hero column entirely, to the canvas) */
+.hero > *:not(.hero-can):not(.telegram) { pointer-events: none; }
 
 .hero-can {
   position: relative;
+  z-index: 10;              /* above #playground (5) so it can catch the grab */
   width: clamp(160px, 26vh, 248px);
-  pointer-events: none;
+  pointer-events: auto;     /* grab + drag it directly to lift it; swipe around it (on .hero) to spin it */
+  touch-action: none;       /* we own the drag gesture, don't let the page scroll/zoom */
+  cursor: grab;
   filter: drop-shadow(0 14px 12px rgba(0, 0, 0, 0.32));
+  transition: filter 0.25s ease;
   animation: canBob 4s ease-in-out infinite;
 }
-.hero-can img { width: 100%; height: auto; display: block; }
+/* lifted while being grabbed/dragged: bigger, softer shadow + a touch of scale;
+   bob is suspended so it doesn't fight the drag translate, and it eases back
+   to (0,0) via an inline transition set in JS on release */
+.hero-can.lifted {
+  z-index: 11;
+  cursor: grabbing;
+  animation: none;
+  filter: drop-shadow(0 30px 24px rgba(0, 0, 0, 0.48));
+}
+.hero-can img {
+  width: 100%;
+  height: auto;
+  display: block;
+  will-change: transform;
+  -webkit-user-drag: none;
+  user-select: none;
+}
 @keyframes canBob {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50%      { transform: translateY(-8px) rotate(1deg); }
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
 }
 
 /* a little swing-tag, like something plucked off a flea-market find */

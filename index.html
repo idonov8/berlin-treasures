@@ -21,12 +21,12 @@
   <main class="hero">
     <!-- Hero trash can (user-supplied illustration, transparent PNG) -->
     <h1 class="title"><span>Berlin</span><span>Treasures</span></h1>
-    <div class="hero-can">
-      <img src="assets/hero-can.png" alt="A grey trash can overflowing with sparkling gold coins" width="640" height="640" />
+    <div class="hero-can" id="heroCan">
+      <img src="assets/hero-can.png" alt="A grey trash can overflowing with sparkling gold coins" width="640" height="640" draggable="false" />
     </div>
 
 
-    <blockquote class="quote">One man&rsquo;s trash is another man&rsquo;s treasure</blockquote>
+    <blockquote class="quote">One person&rsquo;s trash is <br> another&rsquo;s treasure</blockquote>
 
     <p class="welcome">Welcome to the Berlin Treasures community!</p>
     <p class="subtext">A place to share awesome street findings with each other</p>
@@ -42,5 +42,6 @@
   <!-- Physics engine (documented so it can be vendored locally for offline use) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
   <script src="physics.js"></script>
+  <script src="spinner.js"></script>
 </body>
 </html>
