@@ -29,16 +29,18 @@
 
   /* ==================================================================
      1. Grab-and-lift: only when the gesture starts near the center of
-        the can. It follows the pointer with some resistance (damped +
-        clamped, not a raw 1:1 drag), then eases back to exactly its
-        resting position on release.
+        the can. It follows the pointer 1:1, free to go anywhere on
+        screen (only clamped so it can't be dragged past the viewport
+        edge), then eases back to exactly its resting position on
+        release.
      ================================================================== */
   var LIFT_ZONE_FRACTION = 0.32;  // normalized radius (of the can's half-size) that counts as "center"
-  var DRAG_DAMPING       = 0.4;   // the can moves at 40% of the pointer's travel — resistant, not 1:1
-  var MAX_LIFT_OFFSET    = 26;    // px — clamps how far it can be dragged, however hard you pull
+  var DRAG_DAMPING       = 1;     // 1:1 — the can tracks the pointer exactly
 
   var lifting = false;
   var liftStartX = 0, liftStartY = 0;
+  var liftMinDx = -Infinity, liftMaxDx = Infinity;
+  var liftMinDy = -Infinity, liftMaxDy = Infinity;
 
   // true only when the pointer is within the central "core" of the can —
   // everything outside that (but still visually on the can) is the spin ring
@@ -47,10 +49,6 @@
     var nx = (clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
     var ny = (clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
     return (nx * nx + ny * ny) <= LIFT_ZONE_FRACTION * LIFT_ZONE_FRACTION;
-  }
-
-  function clampOffset(v) {
-    return Math.max(-MAX_LIFT_OFFSET, Math.min(MAX_LIFT_OFFSET, v));
   }
 
   function liftRender(dx, dy, scale) {
@@ -62,6 +60,12 @@
     lifting = true;
     liftStartX = e.clientX;
     liftStartY = e.clientY;
+    // let it travel anywhere on screen, just not off the edge of the viewport
+    var rect = wrap.getBoundingClientRect();
+    liftMinDx = -rect.left;
+    liftMaxDx = window.innerWidth - rect.right;
+    liftMinDy = -rect.top;
+    liftMaxDy = window.innerHeight - rect.bottom;
     wrap.style.transition = '';   // interrupt any in-progress snap-back
     wrap.classList.add('lifted');
     if (wrap.setPointerCapture) {
@@ -73,8 +77,8 @@
 
   function onLiftMove(e) {
     if (!lifting) return;
-    var dx = clampOffset((e.clientX - liftStartX) * DRAG_DAMPING);
-    var dy = clampOffset((e.clientY - liftStartY) * DRAG_DAMPING);
+    var dx = Math.max(liftMinDx, Math.min(liftMaxDx, (e.clientX - liftStartX) * DRAG_DAMPING));
+    var dy = Math.max(liftMinDy, Math.min(liftMaxDy, (e.clientY - liftStartY) * DRAG_DAMPING));
     liftRender(dx, dy, 1.06);
     e.stopPropagation();
   }
