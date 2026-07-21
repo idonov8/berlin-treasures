@@ -75,11 +75,22 @@ body {
 }
 
 /* ---- hero (content column) ----------------------------------------- */
+/* #spinZone (sized/positioned by spinner.js around the can) is the only thing
+   that intercepts swipe-to-spin now — everywhere else in/around the hero
+   column falls through to #playground so the falling cans stay draggable */
+.spin-zone {
+  position: fixed;
+  z-index: 7;                /* above #playground (5) + .grain (6), below .hero-can/.telegram (10) */
+  pointer-events: auto;
+  border-radius: 50%;
+  touch-action: none;        /* we own this swipe gesture, don't let the page scroll/zoom */
+}
+
 .hero {
   position: relative;
-  z-index: 9;               /* above #playground (5) so it can catch swipe-to-spin, below .telegram (10) */
-  pointer-events: auto;     /* the whole column is the "spin zone" — swipe anywhere here (but not on the can) to spin it */
-  touch-action: none;       /* we own the swipe gesture, don't let the page scroll/zoom */
+  z-index: 9;               /* above #playground (5) so its own children (can, Telegram) sit on top */
+  pointer-events: none;     /* only children with their own pointer-events:auto are interactive; empty space falls through to the canvas */
+  touch-action: pan-y;      /* allow vertical scrolling; the can itself (below) still owns its own drag/swipe */
   user-select: none;
   max-width: var(--hero-max);
   margin: 0 auto;

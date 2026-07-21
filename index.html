@@ -17,6 +17,10 @@
   <!-- Interactive physics layer (Matter.js draws the falling / draggable cans + gold here) -->
   <canvas id="playground" aria-hidden="true"></canvas>
   <div class="grain" aria-hidden="true"></div>
+  <!-- Invisible hit-area sized/positioned by spinner.js around the hero can — the only
+       part of the page that intercepts swipes-to-spin, so the falling cans stay
+       draggable everywhere else on the canvas -->
+  <div class="spin-zone" id="spinZone" aria-hidden="true"></div>
 
   <main class="hero">
     <!-- Hero trash can (user-supplied illustration, transparent PNG) -->

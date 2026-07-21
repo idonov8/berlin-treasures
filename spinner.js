@@ -17,6 +17,7 @@
   var hero = document.querySelector('.hero');
   var wrap = document.getElementById('heroCan');
   var img = wrap ? wrap.querySelector('img') : null;
+  var spinZone = document.getElementById('spinZone');
   if (!hero || !wrap || !img) return;
 
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -109,11 +110,14 @@
   wrap.addEventListener('pointercancel', onLiftUp);
 
   /* ==================================================================
-     2. Swipe-to-spin: any directional swipe within the hero column
-        (excluding the can and the Telegram button) spins the can's
-        rotation. Inertia decays like a fidget spinner, then it eases
-        back to its upright orientation.
+     2. Swipe-to-spin: a directional swipe that starts near the can
+        (the ring around its core, not the whole hero column) spins
+        the can's rotation. Inertia decays like a fidget spinner, then
+        it eases back to its upright orientation. Gestures that start
+        elsewhere in the hero (over the title, quote, Telegram button,
+        etc.) are left alone so they don't hijack scrolling/clicking.
      ================================================================== */
+  var SPIN_ZONE_FRACTION = 1.5;   // normalized radius (of the can's half-size) that still counts as "around the can"
   var TICK_STEP       = 45;     // degrees between haptic "ratchet" clicks
   var FRICTION        = 0.985;  // per-16.7ms-frame velocity decay while free-spinning
   var MIN_VELOCITY    = 0.006;  // deg/ms — below this, the free-spin loop stops
@@ -197,16 +201,43 @@
     return !!(target.closest && target.closest('.telegram'));
   }
 
+  // only spin when the gesture starts within a ring around the can —
+  // not anywhere in the hero column — so the rest of the page (title,
+  // quote, scrolling, etc.) stays untouched
+  function isNearCan(clientX, clientY) {
+    var rect = wrap.getBoundingClientRect();
+    var nx = (clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
+    var ny = (clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
+    return (nx * nx + ny * ny) <= SPIN_ZONE_FRACTION * SPIN_ZONE_FRACTION;
+  }
+
+  // #spinZone is the only element that visibly covers the ring around the
+  // can (everywhere else there falls through to the physics canvas), so
+  // keep it sized/positioned to match the circle isNearCan checks against
+  function updateSpinZone() {
+    if (!spinZone) return;
+    var rect = wrap.getBoundingClientRect();
+    var d = Math.max(rect.width, rect.height) * SPIN_ZONE_FRACTION;
+    var cx = rect.left + rect.width / 2;
+    var cy = rect.top + rect.height / 2;
+    spinZone.style.width = d + 'px';
+    spinZone.style.height = d + 'px';
+    spinZone.style.left = (cx - d / 2) + 'px';
+    spinZone.style.top = (cy - d / 2) + 'px';
+  }
+  updateSpinZone();
+  window.addEventListener('resize', updateSpinZone);
+
   function onSpinDown(e) {
-    if (isExcluded(e.target)) return;
+    if (isExcluded(e.target) || !isNearCan(e.clientX, e.clientY)) return;
     cancelSpin();
     img.style.transition = '';   // interrupt any in-progress settle animation
     spinning = true;
     velocity = 0;
     lastX = e.clientX;
     lastTime = performance.now();
-    if (hero.setPointerCapture) {
-      try { hero.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+    if (e.currentTarget.setPointerCapture) {
+      try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
     }
   }
 
@@ -240,8 +271,19 @@
     }
   }
 
+  // "hero" catches swipes that start directly on the can's own artwork
+  // (bubbled up from #heroCan, outside the tight lift-core); "spinZone"
+  // catches the ring beyond the can's box, which otherwise falls through
+  // straight to the physics canvas
   hero.addEventListener('pointerdown', onSpinDown);
   hero.addEventListener('pointermove', onSpinMove);
   hero.addEventListener('pointerup', onSpinUp);
   hero.addEventListener('pointercancel', onSpinUp);
+
+  if (spinZone) {
+    spinZone.addEventListener('pointerdown', onSpinDown);
+    spinZone.addEventListener('pointermove', onSpinMove);
+    spinZone.addEventListener('pointerup', onSpinUp);
+    spinZone.addEventListener('pointercancel', onSpinUp);
+  }
 })();
